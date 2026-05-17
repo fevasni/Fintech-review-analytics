@@ -161,4 +161,8 @@ The processed dataset (`notebooks/processed_reviews.csv`) contains merged and cl
 
 ## 📄 License
 
+<<<<<<< task-2
 This project is for academic and research purposes. See [LICENSE](LICENSE) for details.
+=======
+This project is for academic and research purposes. See [LICENSE](LICENSE) for details.
+>>>>>>> main
