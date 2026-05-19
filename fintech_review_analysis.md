@@ -79,3 +79,10 @@ This report presents findings from the customer review analysis of three major E
 ### 🛠️ Dashen Bank
 1.  **Fayda ID Integration Debugging**: Optimize the integration with the National ID (Fayda) database to handle timeouts gracefully and prevent generic "something went wrong" error states during virtual account creation.
 2.  **Customer Support Operations**: Introduce an in-app live chat support feature to reduce queue congestion on the phone lines and improve hold times.
+
+## 4. Data Limitations & Potential Biases
+
+When interpreting these findings, it is important to consider potential biases inherent in app store review data:
+- **Negativity Bias**: Users are generally more motivated to leave a review after a frustrating experience (e.g., app crashes, transaction failures) than after a normal, successful interaction. This can skew the overall sentiment negatively compared to the broader user base's experience.
+- **Sampling Bias**: The scraped dataset may be constrained by date limits or app store sorting algorithms (e.g., showing only recent or "most relevant" reviews). It may not perfectly represent the long-term historical performance of the applications.
+- **Self-Selection Bias**: The demographic of users who choose to leave app store reviews may not be perfectly representative of the entire customer base in Ethiopia.
