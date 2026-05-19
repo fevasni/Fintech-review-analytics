@@ -103,6 +103,31 @@ To store scraped and analyzed bank reviews in PostgreSQL:
    python scripts/insert_reviews.py
    ```
 
+### 6. Database schema summary
+The project now persists app-level metadata and sentiment scoring in PostgreSQL:
+- `banks(bank_id, bank_name, app_name)` — stores the mobile banking application package/name per bank.
+- `reviews(review_id, bank_id, review_text, rating, review_date, sentiment_label, sentiment_score, identified_theme, source)` — stores each review with its sentiment score and theme.
+
+### 7. Example SQL queries
+```sql
+-- List all bank apps with their package name
+SELECT bank_id, bank_name, app_name FROM banks;
+
+-- Get the top 10 most positive reviews by sentiment score
+SELECT r.review_id, r.review_text, r.sentiment_label, r.sentiment_score, b.bank_name
+FROM reviews r
+JOIN banks b ON r.bank_id = b.bank_id
+ORDER BY r.sentiment_score DESC
+LIMIT 10;
+
+-- Compare average sentiment scores by bank
+SELECT b.bank_name, AVG(r.sentiment_score) AS avg_sentiment
+FROM reviews r
+JOIN banks b ON r.bank_id = b.bank_id
+GROUP BY b.bank_name
+ORDER BY avg_sentiment DESC;
+```
+
 ---
 
 ## 📦 Dependencies

@@ -87,11 +87,14 @@ def merge_and_prepare_data(clean_path: Path, proc_path: Path) -> tuple[pd.DataFr
     df_reviews['review_id'] = range(1, len(df_reviews) + 1)
 
     # Add defaults if columns are missing
+    df_reviews['sentiment_score'] = df_reviews.get('sentiment_score', 0.0)
     df_reviews['review_date'] = df_reviews.get('date', '2026-05-19')
     df_reviews['source'] = df_reviews.get('source', 'Google Play')
 
-    # Extract unique banks
-    df_bank = df_reviews[['bank_id', 'bank_name']].drop_duplicates().dropna()
+    # Extract unique banks and include the app package/name field
+    df_bank = df_reviews[['bank_id', 'bank_name', 'app']].rename(columns={'app': 'app_name'})
+    df_bank['app_name'] = df_bank['app_name'].fillna(df_bank['bank_name'])
+    df_bank = df_bank.drop_duplicates(subset=['bank_id'])
 
     return df_reviews, df_bank
 
@@ -109,11 +112,11 @@ def insert_to_db(df_reviews: pd.DataFrame, df_bank: pd.DataFrame, db_config: dic
         for _, row in df_bank.iterrows():
             cur.execute(
                 """
-                INSERT INTO banks (bank_id, bank_name)
-                VALUES (%s, %s)
-                ON CONFLICT (bank_id) DO UPDATE SET bank_name = EXCLUDED.bank_name;
+                INSERT INTO banks (bank_id, bank_name, app_name)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (bank_id) DO UPDATE SET bank_name = EXCLUDED.bank_name, app_name = EXCLUDED.app_name;
                 """,
-                (int(row["bank_id"]), row["bank_name"])
+                (int(row["bank_id"]), row["bank_name"], row["app_name"])
             )
         logger.info("Successfully populated banks table (count: %d).", len(df_bank))
 
@@ -123,8 +126,8 @@ def insert_to_db(df_reviews: pd.DataFrame, df_bank: pd.DataFrame, db_config: dic
         for _, row in df_reviews.iterrows():
             cur.execute(
                 """
-                INSERT INTO reviews (review_id, bank_id, review_text, sentiment_label, identified_theme, rating, review_date, source)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO reviews (review_id, bank_id, review_text, sentiment_label, sentiment_score, identified_theme, rating, review_date, source)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (review_id) DO NOTHING;
                 """,
                 (
@@ -132,6 +135,7 @@ def insert_to_db(df_reviews: pd.DataFrame, df_bank: pd.DataFrame, db_config: dic
                     int(row["bank_id"]),
                     row["review_text"],
                     row["sentiment_label"],
+                    float(row["sentiment_score"]),
                     row["identified_theme"],
                     int(row["rating"]),
                     row["review_date"],
