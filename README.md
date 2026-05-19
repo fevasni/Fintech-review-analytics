@@ -23,6 +23,9 @@ This project collects user reviews from mobile banking apps on the Google Play S
 ```
 fintech-review-analytics/
 │
+├── database/                           # Database schema definitions
+│   └── schema.sql                     # PostgreSQL schema setup script
+│
 ├── notebooks/                          # Jupyter notebooks for exploration & analysis
 │   ├── BOA_scraping_preprocessing.ipynb       # Bank of Abyssinia — scraping & preprocessing
 │   ├── CBE_scraping_preprocessing.ipynb       # CBE — scraping & preprocessing
@@ -32,6 +35,7 @@ fintech-review-analytics/
 │   └── data/                                  # Raw scraped data per bank
 │
 ├── scripts/                            # Standalone Python scripts
+│   ├── insert_reviews.py              # Script to load and insert reviews into DB
 │   └── nlp_preprocessing.py           # Modular NLP pipeline (tokenize → clean → lemmatize)
 │
 ├── src/                                # Reusable source modules
@@ -82,6 +86,22 @@ Create a `.env` file in the project root if API keys or configuration values are
 # Example
 SOME_API_KEY=your_key_here
 ```
+
+### 5. PostgreSQL Database Setup
+To store scraped and analyzed bank reviews in PostgreSQL:
+1. Ensure PostgreSQL is installed and running on your local machine.
+2. Create a new database named `bank_review`:
+   ```sql
+   CREATE DATABASE bank_review;
+   ```
+3. Run the schema creation file to initialize the tables:
+   ```bash
+   psql -U your_username -d bank_review -f database/schema.sql
+   ```
+4. Insert the scraped and processed bank reviews into the database by running:
+   ```bash
+   python scripts/insert_reviews.py
+   ```
 
 ---
 
@@ -161,8 +181,4 @@ The processed dataset (`notebooks/processed_reviews.csv`) contains merged and cl
 
 ## 📄 License
 
-<<<<<<< task-2
 This project is for academic and research purposes. See [LICENSE](LICENSE) for details.
-=======
-This project is for academic and research purposes. See [LICENSE](LICENSE) for details.
->>>>>>> main
